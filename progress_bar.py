@@ -169,8 +169,8 @@ def __cleanup_on_interrupt(sig, frame):
 
 
 def __tput(cmd, *args):
-    #print(curses.tparm(curses.tigetstr("el")).decode(), end='')
-    print(curses.tparm(curses.tigetstr("el")).decode())
+    print(curses.tparm(curses.tigetstr("el")).decode(), end='')
+    #print(curses.tparm(curses.tigetstr("el")).decode())
 
 
 def __print_control_code(code):
