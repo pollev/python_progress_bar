@@ -19,11 +19,11 @@ def generate_some_output_and_sleep():
     print(random_string())
     print(random_string())
     print("\n\n------------------------------------------------------------------")
-    print("\n\n Now sleeping briefly \n\n")
+    print("\n\n Now sleeping briefly")
     time.sleep(0.3)
 
 
-main():
+def main():
     # Make sure that the progress bar is cleaned up when user presses ctrl+c
     progress_bar.enable_trapping()
     # Create progress bar
@@ -31,12 +31,12 @@ main():
     for i in range(99):
         if i == 50:
             print("waiting for user input: ")
-            block_progress_bar(i)
+            progress_bar.block_progress_bar(i)
             input("User input: ")
         else:
             generate_some_output_and_sleep()
-            draw_progress_bar(i)
-    destroy_scroll_area()
+            progress_bar.draw_progress_bar(i)
+    progress_bar.destroy_scroll_area()
 
 
 main()

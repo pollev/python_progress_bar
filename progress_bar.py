@@ -17,11 +17,11 @@ import curses
 CODE_SAVE_CURSOR = "\033[s"
 CODE_RESTORE_CURSOR = "\033[u"
 CODE_CURSOR_IN_SCROLL_AREA = "\033[1A"
-COLOR_FG = "\e[30m"
-COLOR_BG = "\e[42m"
-COLOR_BG_BLOCKED = "\e[43m"
-RESTORE_FG = "\e[39m"
-RESTORE_BG = "\e[49m"
+COLOR_FG = '\033[30m'
+COLOR_BG = '\033[42m'
+COLOR_BG_BLOCKED = '\033[43m'
+RESTORE_FG = '\033[39m'
+RESTORE_BG = '\033[49m'
 
 # Variables
 PROGRESS_BLOCKED = False
@@ -37,14 +37,14 @@ def setup_scroll_area():
     if TRAPPING_ENABLED:
         __trap_on_interrupt()
 
-    lines = __tput("lines") - 1
+    lines = curses.tigetnum("lines") - 1
     # Scroll down a bit to avoid visual glitch when the screen area shrinks by one row
     __print_control_code("\n")
 
     # Save cursor
     __print_control_code(CODE_SAVE_CURSOR)
     # Set scroll region (this will place the cursor in the top left)
-    __print_control_code("\033[0;" + lines + "r")
+    __print_control_code("\033[0;" + str(lines) + "r")
 
     # Restore cursor but ensure its inside the scrolling area
     __print_control_code(CODE_RESTORE_CURSOR)
@@ -55,11 +55,11 @@ def setup_scroll_area():
 
 
 def destroy_scroll_area():
-    lines = __tput("lines")
+    lines = curses.tigetnum("lines")
     # Save cursor
     __print_control_code(CODE_SAVE_CURSOR)
     # Set scroll region (this will place the cursor in the top left)
-    __print_control_code("\033[0;" + lines + "r")
+    __print_control_code("\033[0;" + str(lines) + "r")
 
     # Restore cursor but ensure its inside the scrolling area
     __print_control_code(CODE_RESTORE_CURSOR)
@@ -78,12 +78,12 @@ def destroy_scroll_area():
 
 def draw_progress_bar(percentage):
     global PROGRESS_BLOCKED
-    lines = __tput("lines")
+    lines = curses.tigetnum("lines")
     # Save cursor
     __print_control_code(CODE_SAVE_CURSOR)
 
     # Move cursor position to last row
-    __print_control_code("\033[" + lines ";0f")
+    __print_control_code("\033[" + str(lines) + ";0f")
 
     # Clear progress bar
     __tput("el")
@@ -96,14 +96,14 @@ def draw_progress_bar(percentage):
     __print_control_code(CODE_RESTORE_CURSOR)
 
 
-def block_progress_bar(percentage) {
+def block_progress_bar(percentage):
     global PROGRESS_BLOCKED
-    lines = __tput("lines")
+    lines = curses.tigetnum("lines")
     # Save cursor
-    __print_control_code($CODE_SAVE_CURSOR)
+    __print_control_code(CODE_SAVE_CURSOR)
 
     # Move cursor position to last row
-    __print_control_code("\033[$" + lines + ";0f")
+    __print_control_code("\033[" + str(lines) + ";0f")
 
     # Clear progress bar
     __tput("el")
@@ -117,12 +117,12 @@ def block_progress_bar(percentage) {
 
 
 def __clear_progress_bar():
-    lines = __tput("lines")
+    lines = curses.tigetnum("lines")
     # Save cursor
-    __print_control_codeCODE_SAVE_CURSOR)
+    __print_control_code(CODE_SAVE_CURSOR)
 
     # Move cursor position to last row
-    __print_control_code("\033[" + lines + ";0f")
+    __print_control_code("\033[" + str(lines) + ";0f")
 
     # clear progress bar
     __tput("el")
@@ -132,7 +132,7 @@ def __clear_progress_bar():
 
 
 def __print_bar_text(percentage):
-    cols = __tput("cols")
+    cols = curses.tigetnum("cols")
     bar_size = cols - 17
 
     color = f"{COLOR_FG}{COLOR_BG}"
@@ -142,7 +142,7 @@ def __print_bar_text(percentage):
     # Prepare progress bar
     complete_size = (bar_size * percentage) / 100
     remainder_size = bar_size - complete_size
-    progress_bar = f"[{color}{'#' * complete_size}{RESTORE_FG}{RESTORE_BG}{'.' * remainder_size}]"
+    progress_bar = f"[{color}{'#' * int(complete_size)}{RESTORE_FG}{RESTORE_BG}{'.' * int(remainder_size)}]"
 
     # Print progress bar
     __print_control_code(f" Progress {percentage}% {progress_bar}")
@@ -154,9 +154,10 @@ def enable_trapping():
 
 
 def __trap_on_interrupt():
+    global TRAP_SET
     # If this function is called, we setup an interrupt handler to cleanup the progress bar
-    TRAP_SET="true"
-    trap __cleanup_on_interrupt INT
+    TRAP_SET = True
+    # trap __cleanup_on_interrupt INT
 
 
 def __cleanup_on_interrupt():
@@ -165,7 +166,8 @@ def __cleanup_on_interrupt():
 
 
 def __tput(cmd, *args):
-    print (tparm(tigetstr(cmd), *args), end='') # Emulates Unix tput
+    #print(curses.tparm(curses.tigetstr("el")).decode(), end='')
+    print(curses.tparm(curses.tigetstr("el")).decode())
 
 
 def __print_control_code(code):
