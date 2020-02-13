@@ -146,7 +146,7 @@ def __print_bar_text(percentage):
     progress_bar = f"[{color}{'#' * int(complete_size)}{RESTORE_FG}{RESTORE_BG}{'.' * int(remainder_size)}]"
 
     # Print progress bar
-    __print_control_code(f" Progress {percentage}% {progress_bar}")
+    __print_control_code(f" Progress {percentage}% {progress_bar}\r")
 
 
 def enable_trapping():
