@@ -1,37 +1,42 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-# Source progress bar
-source ./progress_bar.sh
+import random
+import string
+import time
 
-generate_some_output_and_sleep() {
-    echo "Here is some output"
-    head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9~!@#$%^&*_-'
-    head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9~!@#$%^&*_-'
-    head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9~!@#$%^&*_-'
-    head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9~!@#$%^&*_-'
-    echo -e "\n\n------------------------------------------------------------------"
-    echo -e "\n\n Now sleeping briefly \n\n"
-    sleep 0.3
-}
+# Import the progress bar
+import progress_bar
 
 
-main() {
+def random_string(string_length=30):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(string_length))
+
+def generate_some_output_and_sleep():
+    print("Here is some output")
+    print(random_string())
+    print(random_string())
+    print(random_string())
+    print(random_string())
+    print("\n\n------------------------------------------------------------------")
+    print("\n\n Now sleeping briefly \n\n")
+    time.sleep(0.3)
+
+
+main():
     # Make sure that the progress bar is cleaned up when user presses ctrl+c
-    enable_trapping
+    progress_bar.enable_trapping()
     # Create progress bar
-    setup_scroll_area
-    for i in {1..99}
-    do
-        if [ $i = 50 ]; then
-            echo "waiting for user input"
-            block_progress_bar $i
-            read -p "User input: "
-        else
-            generate_some_output_and_sleep
-            draw_progress_bar $i
-        fi
-    done
-    destroy_scroll_area
-}
+    progress_bar.setup_scroll_area()
+    for i in range(99):
+        if i == 50:
+            print("waiting for user input: ")
+            block_progress_bar(i)
+            input("User input: ")
+        else:
+            generate_some_output_and_sleep()
+            draw_progress_bar(i)
+    destroy_scroll_area()
 
-main
+
+main()
