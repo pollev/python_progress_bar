@@ -1,4 +1,4 @@
-# bash_progress_bar
+# python_progress_bar
 
 > Note: There exists also the original [bash implementation](https://github.com/pollev/bash_progress_bar)
 
