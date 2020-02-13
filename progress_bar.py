@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import curses
+import signal
 
 # Usage:
 # import progress_bar                           <- Import this module
@@ -27,7 +28,7 @@ RESTORE_BG = '\033[49m'
 PROGRESS_BLOCKED = False
 TRAPPING_ENABLED = False
 TRAP_SET = False
-
+original_sigint_handler = None
 
 def setup_scroll_area():
     # Setup curses support (to get information about the terminal we are running in)
@@ -71,9 +72,9 @@ def destroy_scroll_area():
     # Scroll down a bit to avoid visual glitch when the screen area grows by one row
     __print_control_code("\n\n")
 
-    # Once the scroll area is cleared, we want to remove any trap previously set. Otherwise, ctrl+c will exit our shell
+    # Once the scroll area is cleared, we want to remove any trap previously set.
     if TRAP_SET:
-        trap - INT
+        signal.signal(signal.SIGINT, original_sigint_handler)
 
 
 def draw_progress_bar(percentage):
@@ -155,14 +156,16 @@ def enable_trapping():
 
 def __trap_on_interrupt():
     global TRAP_SET
+    global original_sigint_handler
     # If this function is called, we setup an interrupt handler to cleanup the progress bar
     TRAP_SET = True
-    # trap __cleanup_on_interrupt INT
+    original_sigint_handler = signal.getsignal(signal.SIGINT)
+    signal.signal(signal.SIGINT, __cleanup_on_interrupt)
 
 
-def __cleanup_on_interrupt():
+def __cleanup_on_interrupt(sig, frame):
     destroy_scroll_area()
-    exit()
+    raise KeyboardInterrupt
 
 
 def __tput(cmd, *args):
