@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 setup(
   name = 'python_progress_bar',
   packages = ['python_progress_bar'],
-  version = '1.0',
+  version = '1.01',
   license='MIT',
   description = 'A progress bar for python shell scripts (Linux)',
   author = 'Polle Vanhoof',
@@ -15,7 +15,7 @@ setup(
   long_description=long_description,
   long_description_content_type="text/markdown",
   url = 'https://github.com/pollev/python_progress_bar',
-  download_url = 'https://github.com/pollev/python_progress_bar/archive/v1.0.tar.gz',
+  download_url = 'https://github.com/pollev/python_progress_bar/archive/v1.01.tar.gz',
   keywords = ['progress', 'bar', 'indicator'],
   install_requires=[
       ],
