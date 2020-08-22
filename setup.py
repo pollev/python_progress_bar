@@ -1,4 +1,9 @@
 from distutils.core import setup
+
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
   name = 'python_progress_bar',
   packages = ['python_progress_bar'],
@@ -7,6 +12,8 @@ setup(
   description = 'A progress bar for python shell scripts (Linux)',
   author = 'Polle Vanhoof',
   author_email = 'vanhoofpolle@gmail.com',
+  long_description=long_description,
+  long_description_content_type="text/markdown",
   url = 'https://github.com/pollev/python_progress_bar',
   download_url = 'https://github.com/pollev/python_progress_bar/archive/v1.0.tar.gz',
   keywords = ['progress', 'bar', 'indicator'],
