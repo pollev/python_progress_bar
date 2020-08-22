@@ -3,14 +3,14 @@ from distutils.core import setup
 setup(
   name = 'python_progress_bar',
   packages = ['python_progress_bar'],
-  version = '1.02',
+  version = '1.03',
   license='MIT',
   description = 'A progress bar for python shell scripts (Linux)',
   author = 'Polle Vanhoof',
   author_email = 'vanhoofpolle@gmail.com',
   long_description= 'Please refer to the full description on github',
   url = 'https://github.com/pollev/python_progress_bar',
-  download_url = 'https://github.com/pollev/python_progress_bar/archive/v1.02.tar.gz',
+  download_url = 'https://github.com/pollev/python_progress_bar/archive/v1.03.tar.gz',
   keywords = ['progress', 'bar', 'indicator'],
   install_requires=[
       ],
