@@ -10,6 +10,10 @@ What makes this progress bar different from the basic terminal progress bars whi
 
 An example can be viewed in `test_bar.py`. The actual implementation can be found in `progress_bar.py`
 
+
+### Install using pip
+    pip3 install python_progress_bar
+
 Example output:
 
 ![](example.gif)
