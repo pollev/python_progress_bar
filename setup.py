@@ -8,7 +8,7 @@ setup(
   author = 'Polle Vanhoof',
   author_email = 'vanhoofpolle@gmail.com',
   url = 'https://github.com/pollev/python_progress_bar',
-  download_url = '',
+  download_url = 'https://github.com/pollev/python_progress_bar/archive/v1.0.tar.gz',
   keywords = ['progress', 'bar', 'indicator'],
   install_requires=[
       ],
