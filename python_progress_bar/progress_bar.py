@@ -2,6 +2,7 @@
 
 import curses
 import signal
+import os
 
 # Usage:
 # import progress_bar                           <- Import this module
@@ -29,8 +30,22 @@ PROGRESS_BLOCKED = False
 TRAPPING_ENABLED = False
 TRAP_SET = False
 original_sigint_handler = None
+CURRENT_NR_LINES = 0
+
+def get_current_nr_lines():
+    stream = os.popen('tput lines')
+    output = stream.read()
+    return int(output)
+
+
+def get_current_nr_cols():
+    stream = os.popen('tput cols')
+    output = stream.read()
+    return int(output)
+
 
 def setup_scroll_area():
+    global CURRENT_NR_LINES
     # Setup curses support (to get information about the terminal we are running in)
     curses.setupterm()
 
@@ -38,7 +53,8 @@ def setup_scroll_area():
     if TRAPPING_ENABLED:
         __trap_on_interrupt()
 
-    lines = curses.tigetnum("lines") - 1
+    CURRENT_NR_LINES = get_current_nr_lines()
+    lines = CURRENT_NR_LINES - 1
     # Scroll down a bit to avoid visual glitch when the screen area shrinks by one row
     __print_control_code("\n")
 
@@ -56,7 +72,7 @@ def setup_scroll_area():
 
 
 def destroy_scroll_area():
-    lines = curses.tigetnum("lines")
+    lines = get_current_nr_lines()
     # Save cursor
     __print_control_code(CODE_SAVE_CURSOR)
     # Set scroll region (this will place the cursor in the top left)
@@ -79,7 +95,12 @@ def destroy_scroll_area():
 
 def draw_progress_bar(percentage):
     global PROGRESS_BLOCKED
-    lines = curses.tigetnum("lines")
+    global CURRENT_NR_LINES
+    lines = get_current_nr_lines()
+
+    if lines != CURRENT_NR_LINES:
+        setup_scroll_area()
+
     # Save cursor
     __print_control_code(CODE_SAVE_CURSOR)
 
@@ -99,7 +120,7 @@ def draw_progress_bar(percentage):
 
 def block_progress_bar(percentage):
     global PROGRESS_BLOCKED
-    lines = curses.tigetnum("lines")
+    lines = get_current_nr_lines()
     # Save cursor
     __print_control_code(CODE_SAVE_CURSOR)
 
@@ -118,7 +139,7 @@ def block_progress_bar(percentage):
 
 
 def __clear_progress_bar():
-    lines = curses.tigetnum("lines")
+    lines = get_current_nr_lines()
     # Save cursor
     __print_control_code(CODE_SAVE_CURSOR)
 
@@ -133,7 +154,7 @@ def __clear_progress_bar():
 
 
 def __print_bar_text(percentage):
-    cols = curses.tigetnum("cols")
+    cols = get_current_nr_cols()
     bar_size = cols - 17
 
     color = f"{COLOR_FG}{COLOR_BG}"
