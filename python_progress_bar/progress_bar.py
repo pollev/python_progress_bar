@@ -4,6 +4,9 @@ import curses
 import signal
 import os
 
+from time import time
+
+
 # Usage:
 # import progress_bar                           <- Import this module
 # progress_bar.enable_trapping()                <- optional to clean up properly if user presses ctrl-c
@@ -31,6 +34,8 @@ TRAPPING_ENABLED = False
 TRAP_SET = False
 original_sigint_handler = None
 CURRENT_NR_LINES = 0
+START_TIME = 0
+
 
 def get_current_nr_lines():
     stream = os.popen('tput lines')
@@ -46,6 +51,7 @@ def get_current_nr_cols():
 
 def setup_scroll_area():
     global CURRENT_NR_LINES
+    global START_TIME
     # Setup curses support (to get information about the terminal we are running in)
     curses.setupterm()
 
@@ -69,6 +75,9 @@ def setup_scroll_area():
 
     # Start empty progress bar
     draw_progress_bar(0)
+
+    # Setup start time
+    START_TIME = time()
 
 
 def destroy_scroll_area():
@@ -154,12 +163,14 @@ def __clear_progress_bar():
 
 
 def __print_bar_text(percentage):
-    cols = get_current_nr_cols()
-    bar_size = cols - 17
-
     color = f"{COLOR_FG}{COLOR_BG}"
     if PROGRESS_BLOCKED:
         color = f"{COLOR_FG}{COLOR_BG_BLOCKED}"
+
+    cols = get_current_nr_cols()
+    # Create right side of progress bar with statistics
+    r_bar = __prepare_r_bar(percentage)
+    bar_size = cols - 18 - len(r_bar)
 
     # Prepare progress bar
     complete_size = (bar_size * percentage) / 100
@@ -167,7 +178,37 @@ def __print_bar_text(percentage):
     progress_bar = f"[{color}{'#' * int(complete_size)}{RESTORE_FG}{RESTORE_BG}{'.' * int(remainder_size)}]"
 
     # Print progress bar
-    __print_control_code(f" Progress {percentage}% {progress_bar}\r")
+    __print_control_code(f" Progress {percentage}% {progress_bar} {r_bar}\r")
+
+
+def __prepare_r_bar(n):
+    global START_TIME
+
+    elapsed = time() - START_TIME
+    elapsed_str = __format_interval(elapsed)
+
+    # Percentage/second rate (or second/percentage if slow)
+    rate = n / elapsed
+    inv_rate = 1 / rate if rate else None
+    rate_noinv_fmt = f"{f'{rate:5.2f}' if rate else '?'}pct/s"
+    rate_inv_fmt = f"{f'{inv_rate:5.2f}' if inv_rate else '?'}s/pct"
+    rate_fmt = rate_inv_fmt if inv_rate and inv_rate > 1 else rate_noinv_fmt
+
+    # Remaining time
+    remaining = (100 - n) / rate if rate else 0
+    remaining_str = __format_interval(remaining) if rate else "?"
+
+    r_bar = f"[{elapsed_str}<{remaining_str}, {rate_fmt}]"
+    return r_bar
+
+
+def __format_interval(t):
+    h_m, s = divmod(int(t), 60)
+    h, m = divmod(h_m, 60)
+    if h:
+        return f"{h:d}:{m:02d}:{s:02d}"
+    else:
+        return f"{m:02d}:{s:02d}"
 
 
 def enable_trapping():
@@ -191,10 +232,8 @@ def __cleanup_on_interrupt(sig, frame):
 
 def __tput(cmd, *args):
     print(curses.tparm(curses.tigetstr("el")).decode(), end='')
-    #print(curses.tparm(curses.tigetstr("el")).decode())
+    # print(curses.tparm(curses.tigetstr("el")).decode())
 
 
 def __print_control_code(code):
     print(code, end='')
-
-
