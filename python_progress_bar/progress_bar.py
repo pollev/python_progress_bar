@@ -35,6 +35,7 @@ TRAP_SET = False
 original_sigint_handler = None
 CURRENT_NR_LINES = 0
 START_TIME = 0
+RATE_BAR = True
 
 
 def get_current_nr_lines():
@@ -49,9 +50,13 @@ def get_current_nr_cols():
     return int(output)
 
 
-def setup_scroll_area():
+def setup_scroll_area(rate_bar=True):
     global CURRENT_NR_LINES
     global START_TIME
+    global RATE_BAR
+
+    # Enable/disable right side of progress bar with statistics
+    RATE_BAR = rate_bar
     # Setup curses support (to get information about the terminal we are running in)
     curses.setupterm()
 
@@ -163,14 +168,20 @@ def __clear_progress_bar():
 
 
 def __print_bar_text(percentage):
+    global RATE_BAR
+
     color = f"{COLOR_FG}{COLOR_BG}"
     if PROGRESS_BLOCKED:
         color = f"{COLOR_FG}{COLOR_BG_BLOCKED}"
 
     cols = get_current_nr_cols()
-    # Create right side of progress bar with statistics
-    r_bar = __prepare_r_bar(percentage)
-    bar_size = cols - 18 - len(r_bar)
+    if RATE_BAR:
+        # Create right side of progress bar with statistics
+        r_bar = __prepare_r_bar(percentage)
+        bar_size = cols - 18 - len(r_bar)
+    else:
+        r_bar = ""
+        bar_size = cols - 17
 
     # Prepare progress bar
     complete_size = (bar_size * percentage) / 100
