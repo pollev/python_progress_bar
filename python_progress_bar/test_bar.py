@@ -10,7 +10,7 @@ import progress_bar
 
 def random_string(string_length=30):
     letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for i in range(string_length))
+    return ''.join(random.choice(letters) for _ in range(string_length))
 
 def generate_some_output_and_sleep():
     print("Here is some output")
